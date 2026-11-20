@@ -8,6 +8,15 @@ dependencies = [
     "scipy==1.16.3",
     "scikit-learn==1.7.2",
     "joblib==1.5.3",
+    "torch==2.10.0",
+    "tabpfn==9.0.0",
+    "tabicl==2.1.1",
+    "tabfm[pytorch]==1.0.1",
+    "catboost==1.2.10",
+    "lightgbm==4.6.0",
+    "xgboost==3.2.0",
+    "optuna==4.7.0",
+    "category-encoders==2.9.0",  # SDB's logistic-regression pipeline
 ]
 
 [dependency-groups]

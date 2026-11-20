@@ -1,4 +1,4 @@
-"""Tests for the Study B pools, draws and injections of scripts/drift_windows.py."""
+"""Tests for the windows of both studies in scripts/drift_windows.py."""
 from __future__ import annotations
 
 import numpy as np
@@ -6,9 +6,12 @@ import pandas as pd
 import pytest
 
 from scripts.drift_windows import (
+    BLOCK,
     COV_SHIFT,
     FRACS,
     SCENARIOS,
+    folds_a,
+    geometry_a,
     inclusion,
     oracle_window,
     pc_score,
@@ -162,3 +165,23 @@ def test_gate_names_each_failed_condition():
     assert v["none"] == "pass"
     assert "mean z^2" in v["cov"] and "off schedule" in v["prior"] and "relabel count" in v["noise"]
     assert "moved prevalence" in v["swap"] and "min class 14" in v["region"]
+
+
+def test_study_a_fitting_and_tuning_rows_precede_their_test_rows():
+    t = np.sort(np.random.default_rng(3).integers(0, 1500, 10_000))  # many ties
+    g = geometry_a(t)
+    cuts = g["cuts"]
+    assert cuts[0] == 0 and cuts[-1] == len(t) and all(np.diff(cuts) > 0)
+    assert all(t[c] != t[c - 1] for c in cuts[1:-1])  # no timestamp is split by a cut
+    assert all(abs(c - BLOCK * k) < 50 for k, c in enumerate(cuts[1:-1], start=1))
+    for h, (a, e) in g["blocks"].items():
+        fits = [g["b1"]] if h == 1 else [g["s1"][h], g["s2"][h]]
+        for fa, fe in fits:
+            assert fe == a and fa >= 0 and t[fe - 1] < t[a]
+        if h > 1:
+            fa, fe = g["s1"][h]
+            assert fe - fa >= g["b1"][1] and (fa == 0 or t[fa] != t[fa - 1])
+    for a, e in [g["b1"], *g["s2"].values()]:
+        for fit, val in folds_a(t, a, e):
+            assert fit[0] == a and fit[-1] + 1 == val[0] and val[-1] < e
+            assert t[fit[-1]] < t[val[0]]

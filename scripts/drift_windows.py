@@ -1,5 +1,6 @@
-"""drift_windows.py: Study B of plan.md, as pure functions of (data, seed), and the
-injection gate (check 1), which fits no model.
+"""drift_windows.py: the windows of both studies in plan.md as pure functions, and the gates,
+which fit no model: the injection gate of Study B (check 1) and checks 2 and 3 of SDB's
+early_stopping_time_plan.md recomputed on the Study A windows.
 
 Per dataset and seed the rows split into five class-stratified pools P1..P5. B1 is P1. Test block
 T_h, h = 1..4, is m = floor(|P_(h+1)| / 2) rows of P_(h+1) at dose fraction h/4, drawn by one of
@@ -12,9 +13,19 @@ The CONCEPT_ONLY candidates that pass the gate join the concept population of H5
 region arm. The gate also records how well a step at the B1 median of the top feature alone
 scores the T4 labels of the region arm (step_auc).
 
-Usage: uv run python -m scripts.drift_windows   (writes results/drift_gate.csv)
+Study A reads SDB's prepared thin files, rows already ordered by time with ties shuffled. B1 is the
+first 2,000 rows, T1..T4 the next blocks of about 2,000, every cut moved to the next timestamp
+boundary. S1 before T_h is the |B1| rows before it, extended back to a boundary; S2 is every row
+before it. Tuning uses three forward folds inside a window: fit on its first 55, 70, 85 %, validate
+on the next 15 %, every edge on a boundary.
+
+Usage: uv run python -m scripts.drift_windows   (writes results/drift_gate.csv and
+results/drift_gate_a.csv)
 """
 from __future__ import annotations
+
+import hashlib
+import json
 
 import numpy as np
 import pandas as pd
@@ -26,7 +37,7 @@ from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
-from sdb import load_data_df
+from sdb import ROOT, load_data_df
 
 STUDY_B = ["banana", "bank-marketing-full", "eeg-eye-state", "hill-valley-with-noise", "magic",
            "phoneme", "qsar-biodegradation", "spambase", "statlog-german-credit",
@@ -40,6 +51,12 @@ CONCEPT = ("noise", "swap", "region")
 FRACS = (0.25, 0.5, 0.75, 1.0)
 COV_SHIFT = 0.5   # target rise of the mean of z^2 at T4, from 1 to 1.5
 MIN_MINORITY = 15
+STUDY_A = ["hotels", "himalaya", "wildlife", "f1-dnf", "nba", "elec", "nebraska-weather", "nycflights",
+           "bank-full"]
+BLOCK = 2000
+FOLDS_A = ((0.55, 0.70), (0.70, 0.85), (0.85, 1.00))
+LABEL_LAG_MAX = 0.05
+PREPARED = ROOT / "results" / "es_time" / "prepared"
 
 
 def seeds(name: str) -> range:
@@ -247,6 +264,97 @@ def verdicts(g: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(out)
 
 
+def _ints(col: pd.Series) -> np.ndarray:
+    """Time as integers: row numbers stay, dates become nanoseconds; only order and ties matter."""
+    num = pd.to_numeric(col, errors="coerce")
+    if num.notna().all():
+        return num.to_numpy().astype("int64")
+    return pd.to_datetime(col, utc=True).dt.tz_localize(None).to_numpy().astype("int64")
+
+
+def load_study_a(name: str) -> tuple[pd.DataFrame, np.ndarray, np.ndarray, np.ndarray | None, list[str]]:
+    """Features, labels (1 = minority), time and label-known time of SDB's prepared thin file, its
+    sha256 checked against the manifest."""
+    path = PREPARED / f"{name}_thin.csv"
+    manifest = json.loads((PREPARED / "_manifest.json").read_text())["prepared"]
+    assert hashlib.sha256(path.read_bytes()).hexdigest() == manifest[path.name], path
+    cats = json.loads((PREPARED / f"{name}.json").read_text())["categorical"]
+    df = pd.read_csv(path, low_memory=False)
+    lk = _ints(df.label_known) if "label_known" in df else None
+    X = df.drop(columns=[c for c in ("t", "y", "label_known") if c in df])
+    cats = [c for c in cats if c in X]
+    X[cats] = X[cats].astype(str)
+    return X, df.y.to_numpy().astype(int), _ints(df.t), lk, cats
+
+
+def boundaries(t: np.ndarray) -> np.ndarray:
+    """Every i in [0, n] where a new timestamp starts."""
+    return np.r_[0, np.flatnonzero(t[1:] != t[:-1]) + 1, len(t)]
+
+
+def _up(b: np.ndarray, i: int) -> int:
+    """The first boundary at or after row i."""
+    return int(b[np.searchsorted(b, i)])
+
+
+def _down(b: np.ndarray, i: int) -> int:
+    """The last boundary at or before row i."""
+    return int(b[np.searchsorted(b, i, side="right") - 1])
+
+
+def geometry_a(t: np.ndarray) -> dict:
+    """Study A windows as (start, end) row ranges: B1, blocks T1..T4, and S1 and S2 before T2..T4."""
+    b = boundaries(t)
+    cuts = [0] + [_up(b, min(BLOCK * k, len(t))) for k in range(1, 5)] + [len(t)]
+    size = cuts[1]
+    return dict(cuts=cuts, b1=(0, cuts[1]), blocks={h: (cuts[h], cuts[h + 1]) for h in range(1, 5)},
+                s1={h: (_down(b, cuts[h] - size), cuts[h]) for h in (2, 3, 4)},
+                s2={h: (0, cuts[h]) for h in (2, 3, 4)})
+
+
+def folds_a(t: np.ndarray, start: int, end: int) -> list[tuple[np.ndarray, np.ndarray]]:
+    """Forward tuning folds inside [start, end): fit on a prefix, validate on the next 15 %."""
+    b = boundaries(t)
+    n = end - start
+    edges = [(_up(b, start + round(f * n)), _up(b, start + round(v * n))) for f, v in FOLDS_A]
+    return [(np.arange(start, f), np.arange(f, min(v, end))) for f, v in edges]
+
+
+def gate_a_rows(name: str) -> list[dict]:
+    """Checks 2 and 3 of SDB's early_stopping_time_plan.md on the Study A windows: the smaller class
+    in every block, window and validation fold, and the share of a window's labels not yet known when
+    the block it feeds starts."""
+    X, y, t, lk, _ = load_study_a(name)
+    g = geometry_a(t)
+    feeds = [("B1", g["b1"], 1)] + [(f"{s}_{h}", g[s][h], h) for s in ("s1", "s2") for h in (2, 3, 4)]
+    rows = [dict(dataset=name, part=f"T{h}", start=a, end=e, rows=e - a,
+                 min_class=int(min(y[a:e].sum(), e - a - y[a:e].sum())), late_share=np.nan)
+            for h, (a, e) in g["blocks"].items()]
+    for label, (a, e), h in feeds:
+        start = g["blocks"][h][0]
+        rows.append(dict(dataset=name, part=label, start=a, end=e, rows=e - a,
+                         min_class=int(min(y[a:e].sum(), e - a - y[a:e].sum())),
+                         late_share=float((lk[a:e] > t[start]).mean()) if lk is not None else np.nan))
+        if label == "B1" or label.startswith("s2"):
+            for k, (fit, val) in enumerate(folds_a(t, a, e)):
+                rows.append(dict(dataset=name, part=f"{label}_val{k}", start=val[0], end=val[-1] + 1,
+                                 rows=len(val), min_class=int(min(y[val].sum(), len(val) - y[val].sum())),
+                                 late_share=float((lk[fit] > t[val[0]]).mean()) if lk is not None else np.nan))
+    return rows
+
+
+def verdicts_a(g: pd.DataFrame) -> pd.DataFrame:
+    """Per dataset: pass, or the failed conditions (blocks >= 15 of the smaller class, fitting windows
+    >= 30, validation folds >= 10, late labels at most 5 %)."""
+    need = g.part.map(lambda p: 15 if p.startswith("T") else 10 if "_val" in p else 30)
+    out = []
+    for ds, d in g.assign(need=need).groupby("dataset", sort=False):
+        fails = [f"{r.part} min class {r.min_class}" for r in d.itertuples() if r.min_class < r.need]
+        fails += [f"{r.part} late labels {r.late_share:.3f}" for r in d.itertuples() if r.late_share > LABEL_LAG_MAX]
+        out.append(dict(dataset=ds, verdict="; ".join(fails) or "pass"))
+    return pd.DataFrame(out)
+
+
 if __name__ == "__main__":
     g = pd.DataFrame([r for name in STUDY_B for r in gate_rows(name)]
                      + [r for name in CONCEPT_ONLY for r in gate_rows(name, ["region"])])
@@ -259,3 +367,7 @@ if __name__ == "__main__":
     print(t4[t4.scenario.isin(["none", "cov"])].groupby(["dataset", "scenario"])[["mean_z", "mean_z2", "prevalence"]]
           .mean().unstack().round(3).to_string())
     print(g.groupby("dataset")[["top_feature", "top_mi"]].first().round(3).to_string())
+    ga = pd.DataFrame([r for name in STUDY_A for r in gate_a_rows(name)])
+    ga.to_csv("results/drift_gate_a.csv", index=False)
+    print(verdicts_a(ga).to_string(index=False))
+    print(ga[ga.part.str.startswith("T")].pivot(index="dataset", columns="part", values="rows").to_string())
