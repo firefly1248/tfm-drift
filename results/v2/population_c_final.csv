@@ -1,0 +1,10 @@
+source,name,did,rows_dedup,features,minority,lgbm_auc,lic,x_pass
+openml:TabArena-v0.1,Diabetes130US,46922,71518.0,47.0,0.088,0.650885141120944,open,True
+openml:OpenML-CC18,adult,1590,48790.0,14.0,0.2394166666666666,0.9276277806415874,open,True
+openml:AutoML benchmark,Higgs,42769,997723.0,28.0,0.4688611111111111,0.8019705836921651,open,True
+openml:AutoML benchmark,MiniBooNE,41150,129598.0,50.0,0.2815555555555555,0.9816780945549436,open,True
+openml:AutoML benchmark,airlines,1169,322765.0,7.0,0.479,0.6002066549714684,open,True
+openml:AutoML benchmark,albert,41147,425240.0,78.0,0.5,0.7334509259259259,unresolved,True
+openml:AutoML benchmark,kick,41162,72983.0,32.0,0.123,0.7523844817901492,unresolved,True
+openml:AutoML benchmark,sf-police-incidents,42732,1746173.0,8.0,0.1306388888888889,0.6066708118363997,open,True
+"openml:Grinsztajn classification, numeric",road-safety,45038,111760.0,32.0,0.5,0.8601526820987654,open,True
