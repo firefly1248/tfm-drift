@@ -64,6 +64,15 @@ LABEL_LAG_MAX = 0.05
 PREPARED = ROOT / "results" / "es_time" / "prepared"
 
 
+def study_a_available() -> bool:
+    return (PREPARED / "_manifest.json").exists()
+
+
+def study_a_missing() -> str:
+    return (f"SDB's prepared files not found at {PREPARED}. Build them with SDB's scripts/es_time_prep.py "
+            "(see SDB results/es_time/DATA_SOURCES.md).")
+
+
 def seeds(name: str) -> range:
     return range(10 if name in SMALL else 3)
 
@@ -280,6 +289,8 @@ def _ints(col: pd.Series) -> np.ndarray:
 def load_study_a(name: str) -> tuple[pd.DataFrame, np.ndarray, np.ndarray, np.ndarray | None, list[str]]:
     """Features, labels (1 = minority), time and label-known time of SDB's prepared thin file, its
     sha256 checked against the manifest."""
+    if not study_a_available():
+        raise FileNotFoundError(study_a_missing())
     path = PREPARED / f"{name}_thin.csv"
     manifest = json.loads((PREPARED / "_manifest.json").read_text())["prepared"]
     assert hashlib.sha256(path.read_bytes()).hexdigest() == manifest[path.name], path
@@ -372,8 +383,11 @@ if __name__ == "__main__":
     print(t4[t4.scenario.isin(["none", "cov"])].groupby(["dataset", "scenario"])[["mean_z", "mean_z2", "prevalence"]]
           .mean().unstack().round(3).to_string())
     print(g.groupby("dataset")[["top_feature", "top_mi"]].first().round(3).to_string())
-    ga = pd.DataFrame([r for name in STUDY_A for r in gate_a_rows(name)])
-    ga = ga[~ga.dataset.isin(RESTRICTED)]
-    ga.to_csv("results/drift_gate_a.csv", index=False)
-    print(verdicts_a(ga).to_string(index=False))
-    print(ga[ga.part.str.startswith("T")].pivot(index="dataset", columns="part", values="rows").to_string())
+    if not study_a_available():
+        print(f"Study A gate skipped: {study_a_missing()}")
+    else:
+        ga = pd.DataFrame([r for name in STUDY_A for r in gate_a_rows(name)])
+        ga = ga[~ga.dataset.isin(RESTRICTED)]
+        ga.to_csv("results/drift_gate_a.csv", index=False)
+        print(verdicts_a(ga).to_string(index=False))
+        print(ga[ga.part.str.startswith("T")].pivot(index="dataset", columns="part", values="rows").to_string())

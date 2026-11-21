@@ -14,6 +14,7 @@ from scripts.drift_analysis import (
     primary_tests,
     primary_values,
     reading_h1,
+    resample,
     s0_star,
     shares,
     signed_rank,
@@ -162,3 +163,17 @@ def test_h1_reading_needs_the_error_ratio_to_move_against_the_lead():
     assert reading_h1(rejected, dict(est=-0.1)).startswith("a different response")
     assert reading_h1(rejected, dict(est=0.1)).startswith("a change of scale")
     assert reading_h1(dict(verdict="not rejected", est=0.01), dict(est=-0.1)) == "not rejected, no reading"
+
+
+def test_a_block_of_one_row_makes_the_independent_draw():
+    n = 50
+    assert np.array_equal(resample(np.random.default_rng(3), n, 1), resample(np.random.default_rng(3), n, None))
+
+
+def test_a_block_draw_is_a_concatenation_of_circular_runs():
+    n, L = 60, 12
+    idx = resample(np.random.default_rng(4), n, L)
+    assert len(idx) == n
+    for run in idx.reshape(-1, L):
+        assert np.array_equal(run, (run[0] + np.arange(L)) % n)
+    assert len(resample(np.random.default_rng(4), 50, 12)) == 50  # the last run is cut

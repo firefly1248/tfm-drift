@@ -484,10 +484,21 @@ def vs_benchmark(leads: pd.DataFrame) -> pd.DataFrame:
 
 # ---------------------------------------------------------------- Study A
 
-def bootstrap_dataset(ds: str, draws: int = 1000) -> list[dict]:
+def resample(rng: np.random.Generator, n: int, L: int | None) -> np.ndarray:
+    """Row indices of one bootstrap draw: independent rows (L = None), or a circular moving-block draw of
+    ceil(n / L) runs of L consecutive rows, cut to n. L = 1 makes the same draw as L = None."""
+    if L is None:
+        return rng.integers(n, size=n)
+    starts = rng.integers(n, size=-(-n // L))
+    return ((starts[:, None] + np.arange(L)) % n).ravel()[:n]
+
+
+def bootstrap_dataset(ds: str, draws: int = 1000, block: bool = False, L: int | None = None) -> list[dict]:
     """Curves of Study A with percentile intervals from resampling each block's rows; every resample is
     shared by all models, seeds and strategies. Per-model values are seed means; the families are
-    means of the three models, and the S2 TFM mean is also given without TabFM (context cap)."""
+    means of the three models, and the S2 TFM mean is also given without TabFM (context cap).
+    With block = True the rows, which are in time order, are resampled in circular blocks of length L
+    (None: round(n ** (1 / 3)) of the test block) and the output has the column L."""
     runs = [joblib.load(p) for p in sorted((RESULTS / ds).glob("*.joblib"))]
     models = sorted({r["model"] for r in runs})
     out = []
@@ -500,6 +511,7 @@ def bootstrap_dataset(ds: str, draws: int = 1000) -> list[dict]:
         assert all(np.array_equal(r["rows"]["none", st, h], rows0) and np.array_equal(r["labels"]["none", st, h], y)
                    for r in runs for st in ("S0", "S1", "S2") if ("none", st, h) in r["rows"])
         rng = np.random.default_rng([STUDY_A.index(ds), h])
+        run_L = (L or round(len(y) ** (1 / 3))) if block else None
 
         def score(idx):
             yb, Q = y[idx][:, None], P[idx]
@@ -509,7 +521,7 @@ def bootstrap_dataset(ds: str, draws: int = 1000) -> list[dict]:
             return {"auc": auc, "logloss": -(yb * np.log(Q) + (1 - yb) * np.log(1 - Q)).mean(axis=0)}
 
         full = score(np.arange(len(y)))
-        boot = [score(rng.integers(len(y), size=len(y))) for _ in range(draws)]
+        boot = [score(resample(rng, len(y), run_L)) for _ in range(draws)]
         for metric in ("auc", "logloss"):
             arr = np.stack([full[metric]] + [b[metric] for b in boot])           # (1 + draws, K)
             u = {}
@@ -525,8 +537,18 @@ def bootstrap_dataset(ds: str, draws: int = 1000) -> list[dict]:
             for name, units in series.items():
                 for unit, a in units.items():
                     out.append(dict(dataset=ds, block=h, strategy=name, unit=unit, metric=metric, est=a[0],
-                                    lo=np.percentile(a[1:], 2.5), hi=np.percentile(a[1:], 97.5)))
+                                    lo=np.percentile(a[1:], 2.5), hi=np.percentile(a[1:], 97.5),
+                                    **({"L": run_L} if block else {})))
     return out
+
+
+def bootstrap_dataset_block(ds: str, L: int | None, draws: int = 1000) -> list[dict]:
+    """Exploratory: bootstrap_dataset with circular moving blocks of L rows (None: round(n ** (1 / 3)))."""
+    return bootstrap_dataset(ds, draws, block=True, L=L)
+
+
+def block_job(item: tuple[str, int | None]) -> list[dict]:
+    return bootstrap_dataset_block(*item)
 
 
 def study_a() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -594,6 +616,8 @@ def main() -> None:
     curves, signs = study_a()
     curves.to_csv(OUT / "drift_study_a_curves.csv", index=False)
     signs.to_csv(OUT / "drift_study_a_signs.csv", index=False)
+    blocks = [r for part in parallel("block_job", [(ds, L) for ds in PUBLIC_A for L in (None, 100)]) for r in part]
+    pd.DataFrame(blocks).to_csv(OUT / "drift_study_a_curves_block.csv", index=False)
 
 
 if __name__ == "__main__":
