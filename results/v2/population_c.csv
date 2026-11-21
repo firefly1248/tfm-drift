@@ -1,0 +1,22 @@
+source,did,name,version,rows_raw,rows_dedup,rows,features,categorical,minority,stage,reason,lgbm_auc,e_gate,x_gate,e_pass,x_pass,low_signal
+openml:TabArena-v0.1,46908,APSFailure,2,76000.0,76000.0,76000.0,170.0,0.0,0.018092105263157895,size,"170 features, minority 0.018",,,,,,
+openml:TabArena-v0.1,46922,Diabetes130US,4,71518.0,71518.0,36000.0,47.0,36.0,0.088,gated,,0.650885141120944,pass,pass,True,True,False
+openml:TabArena-v0.1,46929,GiveMeSomeCredit,1,150000.0,149391.0,36000.0,10.0,0.0,0.067,gated,,0.8536581759141256,pass,window min class 11,True,False,False
+openml:TabArena-v0.1,46910,bank-marketing,10,45211.0,44937.0,44937.0,13.0,8.0,0.1176313505574471,v1,a v1 dataset or a version of one,,,,,,
+openml:TabArena-v0.1,46920,customer_satisfaction_in_airline,1,129880.0,129880.0,36000.0,21.0,3.0,0.45266666666666666,ceiling or floor,LightGBM AUC 0.991,0.990947004871908,,,,,
+openml:TabArena-v0.1,46939,kddcup09_appetency,2,50000.0,50000.0,50000.0,212.0,38.0,0.0178,size,"212 features, minority 0.018",,,,,,
+openml:OpenML-CC18,1590,adult,2,48842.0,48790.0,36000.0,14.0,8.0,0.23941666666666667,gated,,0.9276277806415874,pass,pass,True,True,False
+openml:OpenML-CC18,151,electricity,1,45312.0,45312.0,45312.0,8.0,0.0,0.4245453742937853,v1,a v1 dataset or a version of one,,,,,,
+openml:OpenML-CC18,23517,numerai28.6,2,96320.0,96320.0,36000.0,21.0,0.0,0.49483333333333335,ceiling or floor,LightGBM AUC 0.516,0.5161882486069407,,,,,
+openml:AutoML benchmark,42733,Click_prediction_small,10,39948.0,39926.0,36000.0,11.0,0.0,0.16844444444444445,gated,,0.7133009688478782,pass,pass,True,True,False
+openml:AutoML benchmark,42769,Higgs,3,1000000.0,997723.0,36000.0,28.0,0.0,0.4688611111111111,gated,,0.8019705836921651,pass,pass,True,True,False
+openml:AutoML benchmark,43072,KDDCup09-Upselling,3,50000.0,50000.0,50000.0,14891.0,189.0,0.07364,size,"14891 features, minority 0.074",,,,,,
+openml:AutoML benchmark,1111,KDDCup09_appetency,1,50000.0,50000.0,50000.0,212.0,38.0,0.0178,copy,same fingerprint as kddcup09_appetency,,,,,,
+openml:AutoML benchmark,41150,MiniBooNE,1,130064.0,129598.0,36000.0,50.0,0.0,0.28155555555555556,gated,,0.9816780945549436,pass,pass,True,True,False
+openml:AutoML benchmark,1169,airlines,1,539383.0,322765.0,36000.0,7.0,3.0,0.479,gated,,0.6002066549714684,pass,pass,True,True,True
+openml:AutoML benchmark,41147,albert,1,425240.0,425240.0,36000.0,78.0,9.0,0.5,gated,,0.7334509259259259,pass,pass,True,True,False
+openml:AutoML benchmark,41162,kick,1,72983.0,72983.0,36000.0,32.0,14.0,0.123,gated,,0.7523844817901492,pass,pass,True,True,False
+openml:AutoML benchmark,42742,porto-seguro,3,595212.0,595212.0,595212.0,57.0,2.0,0.036447517859182946,size,"57 features, minority 0.036",,,,,,
+openml:AutoML benchmark,41161,riccardo,1,,,,,,,load,"ProtocolError: ('Connection broken: IncompleteRead(9437184 bytes read, 331012111 more expected)",,,,,,
+openml:AutoML benchmark,42732,sf-police-incidents,6,2215023.0,1746173.0,36000.0,8.0,2.0,0.1306388888888889,gated,,0.6066708118363997,pass,pass,True,True,True
+"openml:Grinsztajn classification, numeric",45038,road-safety,7,111762.0,111760.0,36000.0,32.0,0.0,0.5,gated,,0.8601526820987654,pass,pass,True,True,False

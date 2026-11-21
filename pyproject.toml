@@ -18,6 +18,7 @@ dependencies = [
     "optuna==4.7.0",
     "category-encoders==2.9.0",  # SDB's logistic-regression pipeline
     "matplotlib==3.11.2",
+    "openml==0.15.1",
 ]
 
 [dependency-groups]

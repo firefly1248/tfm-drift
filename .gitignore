@@ -7,3 +7,4 @@ results/runs/
 catboost_info/
 results/restricted/
 drift_runs.tar.xz
+results/runs_v2/
