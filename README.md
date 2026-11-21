@@ -6,7 +6,7 @@ Datasets, the loader and the model wrappers come from [SmallDataBenchmarks](http
 
 Setup:
 
-1. Clone SDB next to this folder, or set `SDB_ROOT`. Any SDB commit works whose `benchmark/` and `config.py` match d8c2e7b; `sdb.assert_pinned` checks this (checked at f2d89f2).
+1. Clone SDB next to this folder, or set `SDB_ROOT`. Any SDB commit works whose `benchmark/` and `config.py` match b25cf15; `sdb.assert_pinned` checks this (checked at b7ec006). `plan.md` names this commit as d8c2e7b, its hash before SDB's author emails were rewritten on 2026-11-21; the tree is the same.
 2. `uv sync`
 3. Study A only: build SDB's prepared files with SDB's `scripts/es_time_prep.py`, following SDB's `results/es_time/DATA_SOURCES.md`. himalaya and f1-dnf need their own access terms. Without this step Study B, the tests and the analysis from the release archive (step 5) still run, and the gate prints that Study A is skipped.
 4. Gate and tests: `uv run python -m scripts.drift_windows`, then `uv run pytest`.

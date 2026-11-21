@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(os.environ.get("SDB_ROOT", Path(__file__).resolve().parent.parent / "SmallDataBenchmarks"))
 sys.path.insert(0, str(ROOT))
-PINNED = "d8c2e7bba66d873c309872bda460a434c5298c2d"  # plan.md: SDB at d8c2e7b
+PINNED = "b25cf159757157394b8e861ceb51ea04a970f231"  # plan.md: SDB at d8c2e7b (same tree, authors rewritten)
 
 
 def assert_pinned() -> None:
