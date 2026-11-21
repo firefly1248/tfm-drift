@@ -1,0 +1,6 @@
+test,n_datasets,n_nonzero,est,lo,hi,p,quantity,holm_p,verdict,reading
+H1,10,10,-0.0015918059504974602,-0.008870126597729344,0.0016858387921475093,0.322265625,"lead in ROC AUC at T4, S0: covariate minus control",1.0,not rejected,"not rejected, no reading"
+H2,10,10,-1.6237736025550512e-05,-0.003255787381670391,0.0066923573483203555,1.0,lead in (S1 - S0) ROC AUC at T4: covariate minus control,1.0,not rejected,
+H3,10,10,0.003051583788832613,-0.0021803402389840515,0.008439402541993738,0.275390625,"lead in (S1 - S0*) log loss at T4: prior minus control, mean of two levels",1.0,not rejected,
+H4,10,10,0.002418491423614992,-0.0032920937691939822,0.008266577135877688,0.556640625,"lead in log loss at T4, S0: covariate minus control",1.0,not rejected,
+H5,11,11,0.03960527897332891,-0.012802205247791687,0.08498570834030744,0.123046875,"TFM share minus booster share at T4, region, ROC AUC",0.615234375,not rejected,"not rejected, no reading"

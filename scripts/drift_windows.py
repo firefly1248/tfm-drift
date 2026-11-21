@@ -53,6 +53,11 @@ COV_SHIFT = 0.5   # target rise of the mean of z^2 at T4, from 1 to 1.5
 MIN_MINORITY = 15
 STUDY_A = ["hotels", "himalaya", "wildlife", "f1-dnf", "nba", "elec", "nebraska-weather", "nycflights",
            "bank-full"]
+# Study A files whose licences bar publishing numbers derived from them (SDB's early_stopping_time_plan.md:
+# the Himalayan Database requires written consent for analyses, Ergast allows non-commercial use only).
+# They are run, and their checkpoints stay local, but no table or figure of this project shows them.
+RESTRICTED = ["himalaya", "f1-dnf"]
+PUBLIC_A = [d for d in STUDY_A if d not in RESTRICTED]
 BLOCK = 2000
 FOLDS_A = ((0.55, 0.70), (0.70, 0.85), (0.85, 1.00))
 LABEL_LAG_MAX = 0.05
@@ -368,6 +373,7 @@ if __name__ == "__main__":
           .mean().unstack().round(3).to_string())
     print(g.groupby("dataset")[["top_feature", "top_mi"]].first().round(3).to_string())
     ga = pd.DataFrame([r for name in STUDY_A for r in gate_a_rows(name)])
+    ga = ga[~ga.dataset.isin(RESTRICTED)]
     ga.to_csv("results/drift_gate_a.csv", index=False)
     print(verdicts_a(ga).to_string(index=False))
     print(ga[ga.part.str.startswith("T")].pivot(index="dataset", columns="part", values="rows").to_string())

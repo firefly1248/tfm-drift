@@ -1,0 +1,89 @@
+strategy,block,unit,metric,sum,count,positive_means
+S0,1,lead,auc,6,7,higher ROC AUC
+S0,1,lead,logloss,2,7,higher log loss (worse)
+S0,1,lead_no_tabfm,auc,6,7,higher ROC AUC
+S0,1,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S0,2,lead,auc,5,7,higher ROC AUC
+S0,2,lead,logloss,5,7,higher log loss (worse)
+S0,2,lead_no_tabfm,auc,4,7,higher ROC AUC
+S0,2,lead_no_tabfm,logloss,5,7,higher log loss (worse)
+S0,3,lead,auc,5,7,higher ROC AUC
+S0,3,lead,logloss,4,7,higher log loss (worse)
+S0,3,lead_no_tabfm,auc,5,7,higher ROC AUC
+S0,3,lead_no_tabfm,logloss,4,7,higher log loss (worse)
+S0,4,lead,auc,5,7,higher ROC AUC
+S0,4,lead,logloss,5,7,higher log loss (worse)
+S0,4,lead_no_tabfm,auc,5,7,higher ROC AUC
+S0,4,lead_no_tabfm,logloss,5,7,higher log loss (worse)
+S1,2,lead,auc,5,7,higher ROC AUC
+S1,2,lead,logloss,2,7,higher log loss (worse)
+S1,2,lead_no_tabfm,auc,5,7,higher ROC AUC
+S1,2,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S1,3,lead,auc,5,7,higher ROC AUC
+S1,3,lead,logloss,2,7,higher log loss (worse)
+S1,3,lead_no_tabfm,auc,5,7,higher ROC AUC
+S1,3,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S1,4,lead,auc,7,7,higher ROC AUC
+S1,4,lead,logloss,2,7,higher log loss (worse)
+S1,4,lead_no_tabfm,auc,7,7,higher ROC AUC
+S1,4,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S1-S0,2,booster,auc,6,7,higher ROC AUC
+S1-S0,2,booster,logloss,0,7,higher log loss (worse)
+S1-S0,2,lead,auc,4,7,higher ROC AUC
+S1-S0,2,lead,logloss,2,7,higher log loss (worse)
+S1-S0,2,lead_no_tabfm,auc,4,7,higher ROC AUC
+S1-S0,2,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S1-S0,2,tfm,auc,6,7,higher ROC AUC
+S1-S0,2,tfm,logloss,0,7,higher log loss (worse)
+S1-S0,3,booster,auc,7,7,higher ROC AUC
+S1-S0,3,booster,logloss,1,7,higher log loss (worse)
+S1-S0,3,lead,auc,3,7,higher ROC AUC
+S1-S0,3,lead,logloss,3,7,higher log loss (worse)
+S1-S0,3,lead_no_tabfm,auc,3,7,higher ROC AUC
+S1-S0,3,lead_no_tabfm,logloss,3,7,higher log loss (worse)
+S1-S0,3,tfm,auc,7,7,higher ROC AUC
+S1-S0,3,tfm,logloss,2,7,higher log loss (worse)
+S1-S0,4,booster,auc,6,7,higher ROC AUC
+S1-S0,4,booster,logloss,2,7,higher log loss (worse)
+S1-S0,4,lead,auc,5,7,higher ROC AUC
+S1-S0,4,lead,logloss,3,7,higher log loss (worse)
+S1-S0,4,lead_no_tabfm,auc,5,7,higher ROC AUC
+S1-S0,4,lead_no_tabfm,logloss,3,7,higher log loss (worse)
+S1-S0,4,tfm,auc,6,7,higher ROC AUC
+S1-S0,4,tfm,logloss,2,7,higher log loss (worse)
+S2,2,lead,auc,5,7,higher ROC AUC
+S2,2,lead,logloss,3,7,higher log loss (worse)
+S2,2,lead_no_tabfm,auc,5,7,higher ROC AUC
+S2,2,lead_no_tabfm,logloss,4,7,higher log loss (worse)
+S2,3,lead,auc,6,7,higher ROC AUC
+S2,3,lead,logloss,2,7,higher log loss (worse)
+S2,3,lead_no_tabfm,auc,6,7,higher ROC AUC
+S2,3,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S2,4,lead,auc,5,7,higher ROC AUC
+S2,4,lead,logloss,2,7,higher log loss (worse)
+S2,4,lead_no_tabfm,auc,6,7,higher ROC AUC
+S2,4,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S2-S0,2,booster,auc,6,7,higher ROC AUC
+S2-S0,2,booster,logloss,0,7,higher log loss (worse)
+S2-S0,2,lead,auc,3,7,higher ROC AUC
+S2-S0,2,lead,logloss,2,7,higher log loss (worse)
+S2-S0,2,lead_no_tabfm,auc,4,7,higher ROC AUC
+S2-S0,2,lead_no_tabfm,logloss,2,7,higher log loss (worse)
+S2-S0,2,tfm,auc,6,7,higher ROC AUC
+S2-S0,2,tfm,logloss,1,7,higher log loss (worse)
+S2-S0,3,booster,auc,7,7,higher ROC AUC
+S2-S0,3,booster,logloss,1,7,higher log loss (worse)
+S2-S0,3,lead,auc,3,7,higher ROC AUC
+S2-S0,3,lead,logloss,3,7,higher log loss (worse)
+S2-S0,3,lead_no_tabfm,auc,3,7,higher ROC AUC
+S2-S0,3,lead_no_tabfm,logloss,3,7,higher log loss (worse)
+S2-S0,3,tfm,auc,7,7,higher ROC AUC
+S2-S0,3,tfm,logloss,1,7,higher log loss (worse)
+S2-S0,4,booster,auc,7,7,higher ROC AUC
+S2-S0,4,booster,logloss,1,7,higher log loss (worse)
+S2-S0,4,lead,auc,3,7,higher ROC AUC
+S2-S0,4,lead,logloss,3,7,higher log loss (worse)
+S2-S0,4,lead_no_tabfm,auc,3,7,higher ROC AUC
+S2-S0,4,lead_no_tabfm,logloss,3,7,higher log loss (worse)
+S2-S0,4,tfm,auc,7,7,higher ROC AUC
+S2-S0,4,tfm,logloss,0,7,higher log loss (worse)

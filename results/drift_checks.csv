@@ -1,0 +1,11 @@
+check,result,status
+2 runs found,567 of 567,pass
+2 runs with a missing or extra cell,0,pass
+2 cells with a missing score,0,pass
+2 non-finite or out-of-range probabilities,0,pass
+2 cells with one distinct prediction (a constant model),"82 in 2 (dataset, model) pairs",REVIEW
+"3 cells within 0.01 of their AP floor, concept arms exempt: mean over seeds | single seeds",19 of 3290 | 418 of 15750,REVIEW
+4 control prevalence per Study B dataset at most 0.51 (label 1 is the minority class),max 0.496,pass
+4 mean S0 ROC AUC at T1 below 0.5 (control; region arm for the concept-only datasets),"0 of 140 (dataset, model)",pass
+6 control diagnostic: 99 % interval of the T4 minus T1 lead excludes 0 for an outcome,"auc [-0.0039, 0.0045], logloss [-0.0053, 0.0068]",pass
+"identity: H2 = (lead in S1, covariate minus control) - H1, largest gap",4.6e-16,pass

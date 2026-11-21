@@ -1,0 +1,41 @@
+dataset,family,change,metric
+banana,tfm,-0.0029134530505023903,error (1 - AUC)
+bank-marketing-full,tfm,-0.002282887616643192,error (1 - AUC)
+eeg-eye-state,tfm,0.00037889885941821966,error (1 - AUC)
+hill-valley-with-noise,tfm,0.0058745897719396645,error (1 - AUC)
+magic,tfm,-0.0050944113309002725,error (1 - AUC)
+phoneme,tfm,-0.002933486342576508,error (1 - AUC)
+qsar-biodegradation,tfm,-0.013709067583640877,error (1 - AUC)
+spambase,tfm,-0.0028023333052090704,error (1 - AUC)
+statlog-german-credit,tfm,0.014189571663730804,error (1 - AUC)
+thyroid-sick-euthyroid,tfm,0.0005995883540053093,error (1 - AUC)
+banana,tfm,-0.011209265901943238,log loss
+bank-marketing-full,tfm,0.005301835328371141,log loss
+eeg-eye-state,tfm,0.009069420669612457,log loss
+hill-valley-with-noise,tfm,0.01927004703117663,log loss
+magic,tfm,-0.014011740721017463,log loss
+phoneme,tfm,-0.008393354658275398,log loss
+qsar-biodegradation,tfm,-0.0314090081689411,log loss
+spambase,tfm,-0.01109813246209651,log loss
+statlog-german-credit,tfm,0.0035966003834656535,log loss
+thyroid-sick-euthyroid,tfm,0.007834885435914513,log loss
+banana,booster,-0.0005073486992229759,error (1 - AUC)
+bank-marketing-full,booster,-0.010451026534339936,error (1 - AUC)
+eeg-eye-state,booster,-0.0012339505729885847,error (1 - AUC)
+hill-valley-with-noise,booster,-0.01429544382972514,error (1 - AUC)
+magic,booster,-0.006489652988498684,error (1 - AUC)
+phoneme,booster,-0.0029078122288050956,error (1 - AUC)
+qsar-biodegradation,booster,-0.01127928717743476,error (1 - AUC)
+spambase,booster,-0.005452087138580808,error (1 - AUC)
+statlog-german-credit,booster,0.019174098680432627,error (1 - AUC)
+thyroid-sick-euthyroid,booster,-0.004939777322689465,error (1 - AUC)
+banana,booster,-0.0016938973123147016,log loss
+bank-marketing-full,booster,0.0006973368930612844,log loss
+eeg-eye-state,booster,-0.0019162539691421343,log loss
+hill-valley-with-noise,booster,-0.001742983217281724,log loss
+magic,booster,-0.008138049968400285,log loss
+phoneme,booster,-0.009073888743021619,log loss
+qsar-biodegradation,booster,-0.030698511383170313,log loss
+spambase,booster,-0.01646915289998996,log loss
+statlog-german-credit,booster,0.008541713693539954,log loss
+thyroid-sick-euthyroid,booster,0.0022874058029137417,log loss

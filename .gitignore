@@ -5,3 +5,4 @@ __pycache__/
 logs/
 results/runs/
 catboost_info/
+results/restricted/
