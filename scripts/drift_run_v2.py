@@ -14,6 +14,7 @@ Usage: uv run python -m scripts.drift_run_v2 <study> <model> <dataset> <seed> [-
 from __future__ import annotations
 
 import argparse
+import gc
 import time
 from contextlib import contextmanager
 from pathlib import Path
@@ -27,7 +28,7 @@ from sklearn.model_selection import StratifiedKFold
 import sdb
 from scripts import drift_run as v1
 from scripts.drift_data_v2 import load_openml, load_sdb
-from scripts.drift_run import BOOSTERS, MODELS, Run, check_versions
+from scripts.drift_run import BOOSTERS, MODELS, TFMS, Run, check_versions
 from scripts.drift_windows import minority_is_one, pc_score, pools, windows
 from scripts.drift_windows_v2 import (
     LEVELS_C,
@@ -75,12 +76,21 @@ def strat(lab: np.ndarray, seed: int) -> list:
     return list(StratifiedKFold(4, shuffle=True, random_state=seed).split(np.zeros(len(lab)), lab))
 
 
+def free(model: str) -> None:
+    """A TFM's MPS allocator keeps what a prediction used; hand it back before the next fit (torch loads only for TFMs)."""
+    if model in TFMS:
+        import torch
+        gc.collect()
+        torch.mps.empty_cache()
+
+
 def score(r: Run, stage: str, m, wanted: dict) -> None:
     """Predict the union of the wanted blocks once and store each block: wanted maps a checkpoint key to (rows, labels)."""
     union = np.unique(np.concatenate([rows for rows, _ in wanted.values()]))
     p = r.proba(stage, m, union)
     for key, (rows, lab) in wanted.items():
         r.store(key, rows, p[np.searchsorted(union, rows)], lab)
+    free(r.model)
 
 
 def tune_fit(r: Run, key: str, idx: np.ndarray, y: np.ndarray, stage: str):

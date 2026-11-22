@@ -81,3 +81,17 @@ def test_study_c_stores_the_window_in_the_strategy():
         assert {("xup", f"U@{w}", h) for h in (1, 2, 3, 4)} <= keys
     assert not any(k[1] in ("S1", "S2") for k in keys)
     assert all(np.array_equal(r.labels[k], y[r.rows[k]]) for k in keys)
+
+
+def test_free_empties_the_mps_cache_for_tfms_only(monkeypatch):
+    import sys
+    import types
+
+    calls = []
+    fake = types.SimpleNamespace(mps=types.SimpleNamespace(empty_cache=lambda: calls.append(1)))
+    monkeypatch.setitem(sys.modules, "torch", fake)
+    v2.free("catboost")
+    assert calls == []
+    for model in ("tabfm", "tabpfn35", "tabicl"):
+        v2.free(model)
+    assert len(calls) == 3
